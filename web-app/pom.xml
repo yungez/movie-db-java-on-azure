@@ -242,6 +242,33 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>com.microsoft.azure</groupId>
+                <artifactId>webapp-maven-plugin</artifactId>
+                <version>0.1.0-SNAPSHOT</version>
+                <configuration>
+                    <authentication>
+                        <serverId>azure-auth</serverId>
+                    </authentication>
+                    <resourceGroup>webapp-maven-demo</resourceGroup>
+                    <appName>webapp-maven-demo</appName>
+                    <containerSetting>
+                        <imageName>${env.ACR_LOGIN_SERVER}/web-app</imageName>
+                        <serverId>${env.ACR_NAME}</serverId>
+                        <registryUrl>https://${env.ACR_LOGIN_SERVER}</registryUrl>
+                    </containerSetting>
+                    <appSettings>
+                        <PORT>${WEB_APP_CONTAINER_PORT}</PORT>
+                        <WEB_APP_CONTAINER_PORT>${WEB_APP_CONTAINER_PORT}</WEB_APP_CONTAINER_PORT>
+                        <STORAGE_CONNECTION_STRING>${STORAGE_CONNECTION_STRING}</STORAGE_CONNECTION_STRING>
+                        <ORIGINAL_IMAGE_CONTAINER>${ORIGINAL_IMAGE_CONTAINER}</ORIGINAL_IMAGE_CONTAINER>
+                        <THUMBNAIL_IMAGE_CONTAINER>${THUMBNAIL_IMAGE_CONTAINER}</THUMBNAIL_IMAGE_CONTAINER>
+                        <DATA_API_URL>${DATA_API_URL}</DATA_API_URL>
+                        <REDIS_HOST>${REDIS_HOST}</REDIS_HOST>
+                        <REDIS_PASSWORD>${REDIS_PASSWORD}</REDIS_PASSWORD>
+                    </appSettings>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>
