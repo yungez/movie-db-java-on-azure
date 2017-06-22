@@ -258,14 +258,14 @@
                         <registryUrl>https://${env.ACR_LOGIN_SERVER}</registryUrl>
                     </containerSetting>
                     <appSettings>
-                        <PORT>${WEB_APP_CONTAINER_PORT}</PORT>
-                        <WEB_APP_CONTAINER_PORT>${WEB_APP_CONTAINER_PORT}</WEB_APP_CONTAINER_PORT>
-                        <STORAGE_CONNECTION_STRING>${STORAGE_CONNECTION_STRING}</STORAGE_CONNECTION_STRING>
-                        <ORIGINAL_IMAGE_CONTAINER>${ORIGINAL_IMAGE_CONTAINER}</ORIGINAL_IMAGE_CONTAINER>
-                        <THUMBNAIL_IMAGE_CONTAINER>${THUMBNAIL_IMAGE_CONTAINER}</THUMBNAIL_IMAGE_CONTAINER>
-                        <DATA_API_URL>${DATA_API_URL}</DATA_API_URL>
-                        <REDIS_HOST>${REDIS_HOST}</REDIS_HOST>
-                        <REDIS_PASSWORD>${REDIS_PASSWORD}</REDIS_PASSWORD>
+                        <PORT>${env.WEB_APP_CONTAINER_PORT}</PORT>
+                        <WEB_APP_CONTAINER_PORT>${env.WEB_APP_CONTAINER_PORT}</WEB_APP_CONTAINER_PORT>
+                        <STORAGE_CONNECTION_STRING>${env.STORAGE_CONNECTION_STRING}</STORAGE_CONNECTION_STRING>
+                        <ORIGINAL_IMAGE_CONTAINER>${env.ORIGINAL_IMAGE_CONTAINER}</ORIGINAL_IMAGE_CONTAINER>
+                        <THUMBNAIL_IMAGE_CONTAINER>${env.THUMBNAIL_IMAGE_CONTAINER}</THUMBNAIL_IMAGE_CONTAINER>
+                        <DATA_API_URL>${env.DATA_API_URL}</DATA_API_URL>
+                        <REDIS_HOST>${env.REDIS_HOST}</REDIS_HOST>
+                        <REDIS_PASSWORD>${env.REDIS_PASSWORD}</REDIS_PASSWORD>
                     </appSettings>
                 </configuration>
             </plugin>
