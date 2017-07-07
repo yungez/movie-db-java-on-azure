@@ -778,7 +778,7 @@ function export_keyvault_uri()
 function create_export_sp()
 {
   local app_name=$1
-  local app_id=$(az ad app create --display-name ${name} --identifier-uri http://test.com/test --homepage http://test.com/test --query appId | tr -d '"')
+  local app_id=$(az ad app create --display-name ${app_name} --identifier-uri http://test.com/test --homepage http://test.com/test --query appId | tr -d '"')
   az ad sp create --id ${app_id}
   local app_key=$(az ad sp reset-credentials --name ${app_id} --query password | tr -d '"')
 
