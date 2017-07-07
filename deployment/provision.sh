@@ -44,6 +44,8 @@ print_banner 'Create service principle...'
 sp_name=${TARGET_ENV}app
 echo ${sp_name}
 create_export_sp ${sp_name}
+vault_name=${TARGET_ENV}vault
+create_keyvault ${vault_name}
 set_keyvault_policy ${sp_name}
 
 
