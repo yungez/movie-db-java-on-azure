@@ -78,6 +78,18 @@
           "contentVersion": "1.0.0.0"
         }
       }
+    },
+    {
+      "apiVersion": "2015-01-01",
+      "name": "keyvault",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "incremental",
+        "templateLink": {
+          "uri": "https://javaonazure.blob.core.windows.net/deployment/keyvault.json",
+          "contentVersion": "1.0.0.0"
+        }
+      }
     }
   ]
 }

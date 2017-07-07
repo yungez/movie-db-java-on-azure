@@ -6,6 +6,7 @@
 
 package com.microsoft.azure.java.samples.moviedb.api;
 
+import com.microsoft.azure.java.samples.moviedb.api.vault.KeyVaultPropertyInitializer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -20,6 +21,9 @@ public class Application {
      * @param args the parameters
      */
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+
+        SpringApplication application = new SpringApplication(Application.class);
+        application.addInitializers(new KeyVaultPropertyInitializer());
+        application.run(args);
     }
 }

@@ -29,3 +29,7 @@ hs_err_pid*
 
 # Spring logs
 logs/
+
+.settings
+.classpath
+.project

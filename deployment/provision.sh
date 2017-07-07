@@ -40,6 +40,12 @@ print_banner 'Start provisioning shared resources...'
 az group create -n ${c_group} -l ${EAST_US}
 create_shared_resources ${c_group} ${MYSQL_ADMIN_USERNAME} ${MYSQL_PASSWORD}
 
+print_banner 'Create service principle...'
+sp_name=${TARGET_ENV}app
+create_export_sp ${sp_name}
+set_keyvault_policy ${sp_name}
+
+
 print_banner 'Start provisioning resources in West US region...'
 az group create -n ${e_us_group} -l ${EAST_US}
 create_webapp ${e_us_group} westus
@@ -80,5 +86,8 @@ deploy_jenkins ${jenkins_group} ${ACS_NAME}
 
 # Set up environment variables for local dev environment
 source dev_setup.sh "$@"
+
+print_banner 'Setting secrets in azure keyvault...'
+set_secrets_in_keyvault ${c_group}
 
 print_banner 'Provision completed'

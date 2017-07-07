@@ -416,6 +416,9 @@ function wait_till_kubernetes_created() {
 #   MYSQL_ENDPOINT
 #   MYSQL_USERNAME
 #   MYSQL_PASSWORD
+#   AZURE_CLIENTID
+#   AZURE_CLIENTKEY
+#   AZUREKEYVAULT_URI
 # Arguments:
 #   resource_group
 #   acs_name
@@ -440,7 +443,10 @@ function create_secrets_in_kubernetes() {
                                           --namespace=${TARGET_ENV} \
                                           --from-literal=mysqlEndpoint=${MYSQL_ENDPOINT} \
                                           --from-literal=mysqlUsername=${MYSQL_USERNAME} \
-                                          --from-literal=mysqlPassword=${MYSQL_PASSWORD}
+                                          --from-literal=mysqlPassword=${MYSQL_PASSWORD} \
+                                          --from-literal=azureClientId=${AZURE_CLIENTID} \
+                                          --from-literal=azureClientKey=${AZURE_CLIENTKEY} \
+                                          --from-literal=azureKeyVaultUri=${AZUREKEYVAULT_URI}
 }
 
 ##############################################################################
@@ -683,6 +689,157 @@ function export_data_api_url()
   local k8_context=$(az acs list -g ${resource_group} --query [0].masterProfile.dnsPrefix | tr '[:upper:]' '[:lower:]' | tr -d '"')
   kubectl config use-context ${k8_context} > /dev/null
   export DATA_API_URL=$(kubectl get services -o jsonpath={.items[*].status.loadBalancer.ingress[0].ip} --namespace=${namespace})
+}
+
+##############################################################################
+# Create azure keyvault
+# Globals:
+#   None
+# Arguments:
+#   resource_group
+#   name: name of keyvault
+#   location: location of keyvalut
+# Returns:
+#   None
+##############################################################################
+function create_keyvault()
+{
+  local resource_group=$1
+  local name=$2
+  local location=$3
+  az keyvault create --name ${name} --resource-group ${resource_group} --location ${location} --enabled-for-deployment true --enabled-for-disk-encryption true --enabled-for-template-deployment true --sku standard
+}
+
+##############################################################################
+# Set secret in azure keyvault
+# Globals:
+#   None
+# Arguments:
+#   keyvault_name: name of keyvault
+#   name: name of secret
+#   value: value of secret
+# Returns:
+#   None
+##############################################################################
+function set_secret()
+{
+  local keyvault_name=$1
+  local name=$2
+  local value=$3
+  az keyvault secret set --vault-name ${keyvalut_name} --name ${name} --value ${value}
+}
+
+##############################################################################
+# Show secret in azure keyvault
+# Globals:
+#   None
+# Arguments:
+#   keyvault_name: name of keyvault
+#   name: name of secret
+# Returns:
+#   value of secret
+##############################################################################
+function show_secret()
+{
+  local keyvault_name=$1
+  local name=$2
+  local value=$(az keyvault secret show --vault-name $keyvalut_name} --name ${name} --query value | tr -d '"')
+
+  echo $value
+}
+
+##############################################################################
+# Export keyvault uri as environment variable
+# Globals:
+#   AZUREKEYVAULT_URI
+# Arguments:
+#   resource_group
+# Returns:
+#   None
+##############################################################################
+function export_keyvault_uri()
+{
+  local resource_group=$1
+  local vault_uri=$(az keyvault list -resource-group ${resource_group} --query [0].properties.vaultUri | tr -d '"')
+
+  export AZUREKEYVAULT_URI=${vault_uri}
+}
+
+##############################################################################
+# Create azure service principle
+# Globals:
+#   AZURE_CLIENTID
+#   AZURE_CLIENTKEY
+# Arguments:
+#   name: name of registered app
+# Returns:
+#   None
+##############################################################################
+function create_export_sp()
+{
+  local app_name=$1
+  local app_id=$(az ad app create --display-name ${name} --identifier-uri http://test.com/test --homepage http://test.com/test --query appId | tr -d '"')
+  az ad sp create --id ${app_id}
+  local app_key=$(az ad sp reset-credentials --name ${app_id} --query password | tr -d '"')
+
+  export AZURE_CLIENTID=${app_id}
+  export AZURE_CLIENTKEY=${app_key}
+}
+
+##############################################################################
+# Set keyvault secret policy, grant all permission to specific service principle
+# Globals:
+#
+# Arguments:
+#   sp name: service principle display name
+# Returns:
+#   None
+##############################################################################
+function set_keyvault_policy()
+{
+  local sp_name=$1
+  local sp_id=$(az ad sp list --display-name ${sp_name} --query [0].appId | tr -d '"')
+  local vault_name=$(az keyvault list --query [0].name | tr -d '"')
+  az keyvault set-policy --name ${vault_name} --secret-permission all --object_id ${sp_id}
+}
+
+##############################################################################
+# Set MySQL server information as azure keyvault secrets
+# Globals:
+#
+# Arguments:
+#   resource_group
+# Returns:
+#   None
+##############################################################################
+function set_database_details_in_keyvault()
+{
+  local resource_group=$1
+  local server_name=$(az mysql server list -g ${resource_group} --query [0].name | tr -d '"')
+  local username=$(az mysql server show -g ${resource_group} -n ${server_name} --query administratorLogin | tr -d '"')
+  local endpoint=$(az mysql server show -g ${resource_group} -n ${server_name} --query fullyQualifiedDomainName | tr -d '"')
+  local database_name=$(az mysql db list -g ${resource_group} --server-name ${server_name} --query [0].name | tr -d '"')
+  local vault_name=$(az keyvault list --query [0].name | tr -d '"')
+
+
+  set_secret ${vault_name} spring-datasource-url jdbc:mysql://${endpoint}:3306/${database_name}?serverTimezone=UTC
+  set_secret ${vault_name} spring-datasoruce-username ${username}@${server_name}
+  set_secret ${vault_name} spring-datasource-password ${MYSQL_PASSWORD}
+}
+
+##############################################################################
+# Set secrets in azure key vault
+# Globals:
+#
+# Arguments:
+#   resource_group
+# Returns:
+#   None
+##############################################################################
+function set_secrets_in_keyvault()
+{
+  set_database_details_in_keyvault
+  export_keyvault_uri
 }
 
 ##############################################################################
