@@ -766,7 +766,7 @@ function export_keyvault_uri()
 }
 
 ##############################################################################
-# Create azure service principle
+# Create azure service principle if not exists
 # Globals:
 #   AZURE_CLIENTID
 #   AZURE_CLIENTKEY
@@ -778,7 +778,12 @@ function export_keyvault_uri()
 function create_export_sp()
 {
   local app_name=$1
-  local app_id=$(az ad app create --display-name ${app_name} --identifier-uri http://test.com/test111 --homepage http://test.com/test --query appId | tr -d '"')
+  local app_id=$(az ad app list --display-name ${app_name} --query [0].appId | tr -d '"')
+
+  if [[ -z "$app_id" ]] then
+    local app_id=$(az ad app create --display-name ${app_name} --identifier-uri http://test.com/test111 --homepage http://test.com/test --query appId | tr -d '"')
+  fi
+
   az ad sp create --id ${app_id}
   local app_key=$(az ad sp reset-credentials --name ${app_id} --query password | tr -d '"')
 
@@ -838,8 +843,9 @@ function set_database_details_in_keyvault()
 ##############################################################################
 function set_secrets_in_keyvault()
 {
-  set_database_details_in_keyvault
-  export_keyvault_uri
+  local resource_group=$1
+  set_database_details_in_keyvault ${resource_group}
+  export_keyvault_uri ${resource_group}
 }
 
 ##############################################################################
