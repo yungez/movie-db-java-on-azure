@@ -761,7 +761,7 @@ function show_secret()
 function export_keyvault_uri()
 {
   local resource_group=$1
-  local vault_uri=$(az keyvault list -resource-group ${resource_group} --query [0].properties.vaultUri | tr -d '"')
+  local vault_uri=$(az keyvault list --resource-group ${resource_group} --query [0].properties.vaultUri | tr -d '"')
 
   export AZUREKEYVAULT_URI=${vault_uri}
 }
