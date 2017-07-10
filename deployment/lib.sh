@@ -804,13 +804,12 @@ function create_export_sp()
 function set_keyvault_policy()
 {
   local sp_name=$1
-  #local sp_id=$(az ad sp list --display-name ${sp_name} --query [0].appId | tr -d '"')
-  local sp_object_id=$(az ad sp show --id ${app_name} --query objectId | tr -d '"')
   local vault_name=$(az keyvault list --query [0].name | tr -d '"')
-  local current_objectid=$(az ad user list --query [0].objectId | tr -d '"')
+  local sp_object_id=$(az ad sp list --display_name ${sp_name} --query [0].objectId | tr -d '"')
+  local current_object_id=$(az ad user list --query [0].objectId | tr -d '"')
 
   az keyvault set-policy --name ${vault_name} --secret-permission all --object-id ${sp_object_id}
-  az keyvault set-policy --name ${vault_name} --secret-permission all --object-id ${current_objectid}
+  az keyvault set-policy --name ${vault_name} --secret-permission all --object-id ${current_object_id}
 }
 
 ##############################################################################
