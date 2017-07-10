@@ -727,7 +727,7 @@ function set_secret()
   local keyvault_name=$1
   local name=$2
   local value=$3
-  az keyvault secret set --vault-name ${keyvalut_name} --name ${name} --value ${value}
+  az keyvault secret set --vault-name ${keyvault_name} --name ${name} --value ${value}
 }
 
 ##############################################################################
@@ -806,7 +806,10 @@ function set_keyvault_policy()
   local sp_name=$1
   local sp_id=$(az ad sp list --display-name ${sp_name} --query [0].appId | tr -d '"')
   local vault_name=$(az keyvault list --query [0].name | tr -d '"')
+  local current_objectid=$(az ad user list --query [0].objectId | tr -d '"')
+
   az keyvault set-policy --name ${vault_name} --secret-permission all --object-id ${sp_id}
+  az keyvault set-policy --name ${vault_name} --secret-permission all --object-id ${current_objectid}
 }
 
 ##############################################################################
