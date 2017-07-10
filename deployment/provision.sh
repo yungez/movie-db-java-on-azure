@@ -42,7 +42,6 @@ create_shared_resources ${c_group} ${MYSQL_ADMIN_USERNAME} ${MYSQL_PASSWORD}
 
 print_banner 'Create service principle...'
 sp_name=${TARGET_ENV}app
-echo ${sp_name}
 create_export_sp ${sp_name}
 
 print_banner 'Set KeyVault policy...'
