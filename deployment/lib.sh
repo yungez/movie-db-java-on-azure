@@ -324,8 +324,9 @@ function create_shared_resources()
   local resource_group=$1
   local username=$2
   local password=$3
+  local tenantid=$(az account show --quey tenantId | tr '"')
   az group deployment create -g ${resource_group} --template-file ./arm/master.json \
-                            --parameters "{\"administratorLogin\": {\"value\": \"${username}\"},\"administratorLoginPassword\": {\"value\": \"${password}\"}}" \
+                            --parameters "{\"administratorLogin\": {\"value\": \"${username}\"},\"administratorLoginPassword\": {\"value\": \"${password}\"}}, {\"tenantId\": {\"value\": \"${tenantid}\"}," \
                             --no-wait
 }
 
@@ -780,11 +781,11 @@ function create_export_sp()
   local app_name=$1
   local app_id=$(az ad app list --display-name ${app_name} --query [0].appId | tr -d '"')
 
-  if [[ -z "$app_id" ]] then
-    local app_id=$(az ad app create --display-name ${app_name} --identifier-uri http://test.com/test111 --homepage http://test.com/test --query appId | tr -d '"')
+  if [[ -z "$app_id" ]]; then
+    local app_id=$(az ad app create --display-name ${app_name} --identifier-uri http://test.com/test --homepage http://test.com/test --query appId | tr -d '"')
+    az ad sp create --id ${app_id}
   fi
 
-  az ad sp create --id ${app_id}
   local app_key=$(az ad sp reset-credentials --name ${app_id} --query password | tr -d '"')
 
   export AZURE_CLIENTID=${app_id}
@@ -805,7 +806,7 @@ function set_keyvault_policy()
   local sp_name=$1
   local sp_id=$(az ad sp list --display-name ${sp_name} --query [0].appId | tr -d '"')
   local vault_name=$(az keyvault list --query [0].name | tr -d '"')
-  az keyvault set-policy --name ${vault_name} --secret-permission all --object_id ${sp_id}
+  az keyvault set-policy --name ${vault_name} --secret-permission all --object-id ${sp_id}
 }
 
 ##############################################################################
