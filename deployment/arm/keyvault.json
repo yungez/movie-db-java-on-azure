@@ -32,7 +32,7 @@
           "family": "A",
           "name": "Standard"
         },
-        "tenantId":"[parameters('tenantId')]",
+        "tenantId": "[parameters('tenantId')]",
         "accessPolicies": [],
         "enabledForDeployment": "true",
         "enabledForDiskEncryption": "false",

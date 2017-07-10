@@ -7,6 +7,9 @@
     },
     "administratorLoginPassword": {
       "type": "securestring"
+    },
+    "tenantId": {
+      "type": "string"
     }
   },
   "variables": {},
@@ -88,6 +91,11 @@
         "templateLink": {
           "uri": "https://javaonazure.blob.core.windows.net/deployment/keyvault.json",
           "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "tenantId": {
+            "value": "[parameters('tenantId')]"
+          }
         }
       }
     }

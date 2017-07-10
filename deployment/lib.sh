@@ -324,9 +324,9 @@ function create_shared_resources()
   local resource_group=$1
   local username=$2
   local password=$3
-  local tenantid=$(az account show --quey tenantId | tr '"')
+  local tenantid=$(az account show --query tenantId | tr -d '"')
   az group deployment create -g ${resource_group} --template-file ./arm/master.json \
-                            --parameters "{\"administratorLogin\": {\"value\": \"${username}\"},\"administratorLoginPassword\": {\"value\": \"${password}\"}}, {\"tenantId\": {\"value\": \"${tenantid}\"}," \
+                            --parameters "{\"administratorLogin\": {\"value\": \"${username}\"},\"administratorLoginPassword\": {\"value\": \"${password}\"},\"tenantId\": {\"value\": \"${tenantid}\"}}" \
                             --no-wait
 }
 
