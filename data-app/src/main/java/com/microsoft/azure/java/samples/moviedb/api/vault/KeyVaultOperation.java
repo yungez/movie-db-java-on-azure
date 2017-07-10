@@ -20,6 +20,10 @@ public class KeyVaultOperation {
     }
 
     public String[] list() {
+        if (baseUri.endsWith("/")) {
+            baseUri = baseUri.substring(0, baseUri.length() - 1);
+        }
+
         if (propertyNames == null) {
             try {
                 PagedList<SecretItem> secrets = client.listSecrets(baseUri);
@@ -39,9 +43,12 @@ public class KeyVaultOperation {
         // NOTE: azure keyvault secret name convention: [0-9a-zA-Z-]+$. "." is not allowed
         secretName = secretName.replace(".", "-");
         try {
-            if (propertyNames == null || Arrays.asList(propertyNames).contains(secretName)) {
-                SecretBundle secret = client.getSecret(baseUri, secretName);
+            if (propertyNames == null) {
+                list();
+            }
 
+            if (Arrays.asList(propertyNames).contains(secretName)) {
+                SecretBundle secret = client.getSecret(baseUri, secretName);
                 try {
                     int valueInt = Integer.parseInt((secret.value()));
                     return valueInt;

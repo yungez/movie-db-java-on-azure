@@ -9,7 +9,7 @@ import org.springframework.core.env.MutablePropertySources;
 
 public class KeyVaultPropertyInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
-    public static final String azureKeyVaultBaseUri = "azure.keyvault.baseuri";
+    public static final String azureKeyVaultBaseUri = "azure.keyvault.uri";
     public static final String azureClientId = "azure.clientid";
     public static final String azureClientKey = "azure.clientkey";
 
