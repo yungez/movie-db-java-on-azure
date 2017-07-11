@@ -806,7 +806,8 @@ function set_keyvault_policy()
   local sp_name=$1
   local vault_name=$(az keyvault list --query [0].name | tr -d '"')
   local sp_object_id=$(az ad sp list --display-name ${sp_name} --query [0].objectId | tr -d '"')
-  local current_object_id=$(az ad user list --query [0].objectId | tr -d '"')
+  local current_upn=$(az account show --query user.name | tr -d '"')
+  local current_object_id=$(az ad user show --upn-or-object-id ${current_upn} --query objectId | tr -d '"')
 
   az keyvault set-policy --name ${vault_name} --secret-permission all --object-id ${sp_object_id}
   az keyvault set-policy --name ${vault_name} --secret-permission all --object-id ${current_object_id}
